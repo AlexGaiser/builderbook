@@ -1,9 +1,11 @@
-const mongoose = require('mongoose');
-const _ = require('lodash');
-const generateSlug = require('../utils/slugify');
-const sendEmail = require('../aws');
-const { getEmailTemplate } = require('./EmailTemplate');
-const logger = require('../logs');
+import User from "./User.model";
+
+const mongoose = require("mongoose");
+const _ = require("lodash");
+const generateSlug = require("../utils/slugify");
+const sendEmail = require("../aws");
+const { getEmailTemplate } = require("./EmailTemplate");
+const logger = require("../logs");
 
 const { Schema } = mongoose;
 
@@ -11,31 +13,31 @@ const mongoSchema = new Schema({
   googleId: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   googleToken: {
     access_token: String,
     refresh_token: String,
     token_type: String,
-    expiry_date: Number,
+    expiry_date: Number
   },
   slug: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   createdAt: {
     type: Date,
-    required: true,
+    required: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   isAdmin: {
     type: Boolean,
-    default: false,
+    default: false
   },
   displayName: String,
   avatarUrl: String,
@@ -45,25 +47,25 @@ const mongoSchema = new Schema({
 
   isGithubConnected: {
     type: Boolean,
-    default: false,
+    default: false
   },
   githubAccessToken: {
-    type: String,
-  },
+    type: String
+  }
 });
 
 class UserClass {
   static publicFields() {
     return [
-      'id',
-      'displayName',
-      'email',
-      'avatarUrl',
-      'slug',
-      'isAdmin',
-      'isGithubConnected',
-      'purchasedBookIds',
-      'freeBookIds',
+      "id",
+      "displayName",
+      "email",
+      "avatarUrl",
+      "slug",
+      "isAdmin",
+      "isGithubConnected",
+      "purchasedBookIds",
+      "freeBookIds"
     ];
   }
 
@@ -71,19 +73,27 @@ class UserClass {
     return this.find(
       {
         $or: [
-          { displayName: { $regex: query, $options: 'i' } },
-          { email: { $regex: query, $options: 'i' } },
-        ],
+          { displayName: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } }
+        ]
       },
-      UserClass.publicFields().join(' '),
+      UserClass.publicFields().join(" ")
     );
   }
 
-  static async signInOrSignUp({ googleId, email, googleToken, displayName, avatarUrl }) {
-    const user = await this.findOne({ googleId }).select(UserClass.publicFields().join(' '));
-
+  static async signInOrSignUp({
+    googleId,
+    email,
+    googleToken,
+    displayName,
+    avatarUrl
+  }) {
+    const user: User = await this.findOne({ googleId }).select(
+      UserClass.publicFields().join(" ")
+    );
+    
     if (user) {
-      const modifier = {};
+      const modifier: any = {};
       if (googleToken.accessToken) {
         modifier.access_token = googleToken.accessToken;
       }
@@ -112,11 +122,11 @@ class UserClass {
       displayName,
       avatarUrl,
       slug,
-      isAdmin: userCount === 0,
+      isAdmin: userCount === 0
     });
 
-    const template = await getEmailTemplate('welcome', {
-      userName: displayName,
+    const template = await getEmailTemplate("welcome", {
+      userName: displayName
     });
 
     try {
@@ -124,10 +134,10 @@ class UserClass {
         from: `Kelly from Builder Book <${process.env.EMAIL_SUPPORT_FROM_ADDRESS}>`,
         to: [email],
         subject: template.subject,
-        body: template.message,
+        body: template.message
       });
     } catch (err) {
-      logger.error('Email sending error:', err);
+      logger.error("Email sending error:", err);
     }
 
     return _.pick(newUser, UserClass.publicFields());
@@ -136,6 +146,6 @@ class UserClass {
 
 mongoSchema.loadClass(UserClass);
 
-const User = mongoose.model('User', mongoSchema);
+const User = mongoose.model("User", mongoSchema);
 
 module.exports = User;

@@ -1,4 +1,5 @@
-const express = require("express");
+import express, { Express } from "express";
+
 const session = require("express-session");
 const compression = require("compression");
 const mongoSessionStore = require("connect-mongo");
@@ -44,7 +45,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 app.prepare().then(async () => {
-  const server = express();
+  const server: Express = express();
 
   server.use(helmet());
   server.use(compression());
@@ -68,18 +69,18 @@ app.prepare().then(async () => {
 
   const MongoStore = mongoSessionStore(session);
   const sess = {
-    name: 'builderbook.sid',
+    name: "builderbook.sid",
     secret: sessionSecret,
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
-      ttl: 14 * 24 * 60 * 60, // save session 14 days
+      ttl: 14 * 24 * 60 * 60 // save session 14 days
     }),
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 14 * 24 * 60 * 60 * 1000, // expires in 14 days
-    },
+      maxAge: 14 * 24 * 60 * 60 * 1000 // expires in 14 days
+    }
   };
 
   if (!dev) {
