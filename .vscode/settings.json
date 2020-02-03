@@ -1,5 +1,5 @@
 {
-  "window.zoomLevel": 0,
+  "window.zoomLevel": 4,
   "files.autoSave": "afterDelay",
   "git.enableSmartCommit": true,
   "editor.formatOnSave": true,
