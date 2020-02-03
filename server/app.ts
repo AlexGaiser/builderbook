@@ -10,7 +10,8 @@ const routesWithSlug = require("./routesWithSlug");
 const routesWithCache = require("./routesWithCache");
 const sitemapAndRobots = require("./sitemapAndRobots");
 
-const auth = require("./google");
+import auth from "./google";
+
 const { setupGithub } = require("./github");
 const api = require("./api");
 
@@ -92,7 +93,16 @@ app.prepare().then(async () => {
 
   await insertTemplates();
 
+  // * ---------Example--------------------------
+
+  // ! Old
   auth({ server, ROOT_URL });
+
+  // ! With TypeScript
+  auth(ROOT_URL, server);
+
+  // * ------------------------------------------
+
   setupGithub({ server });
   api(server);
 

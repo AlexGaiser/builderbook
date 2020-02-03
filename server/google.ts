@@ -105,4 +105,4 @@ function auth(ROOT_URL: string, server: Express) {
   });
 }
 
-module.exports = auth;
+export default auth;
